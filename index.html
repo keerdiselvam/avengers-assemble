@@ -222,7 +222,24 @@ button{min-height:44px;}
 #login-error{font-size:1rem!important;margin-top:10px!important;}
 @media(max-width:899px){#login{padding:28px 18px 90px!important;}#login>.glass{width:min(680px,100%)!important;padding:28px 22px!important;}#login h1{font-size:2.35rem!important;}#login p{font-size:1.05rem!important;}}
 </style>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2244%22%20fill%3D%22%23f7f1e9%22/%3E%3Cpath%20d%3D%22M80%2024C61%2049%2042%2067%2042%2091c0%2024%2017%2043%2038%2043s38-19%2038-43c0-24-19-42-38-67Z%22%20fill%3D%22%23167c80%22/%3E%3Cpath%20d%3D%22M80%2047c-10%2014-19%2025-19%2038%200%2012%208%2021%2019%2021s19-9%2019-21c0-13-9-24-19-38Z%22%20fill%3D%22%23f7f1e9%22/%3E%3Cpath%20d%3D%22M55%2079c9-7%2020-10%2031-9%207%201%2013%204%2019%208-7-2-14-2-21%200-10%202-19%207-29%2014Z%22%20fill%3D%22%237d2f3a%22/%3E%3C/svg%3E"></head>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20160%20160%22%3E%3Crect%20width%3D%22160%22%20height%3D%22160%22%20rx%3D%2244%22%20fill%3D%22%23f7f1e9%22/%3E%3Cpath%20d%3D%22M80%2024C61%2049%2042%2067%2042%2091c0%2024%2017%2043%2038%2043s38-19%2038-43c0-24-19-42-38-67Z%22%20fill%3D%22%23167c80%22/%3E%3Cpath%20d%3D%22M80%2047c-10%2014-19%2025-19%2038%200%2012%208%2021%2019%2021s19-9%2019-21c0-13-9-24-19-38Z%22%20fill%3D%22%23f7f1e9%22/%3E%3Cpath%20d%3D%22M55%2079c9-7%2020-10%2031-9%207%201%2013%204%2019%208-7-2-14-2-21%200-10%202-19%207-29%2014Z%22%20fill%3D%22%237d2f3a%22/%3E%3C/svg%3E"><style id="karuthu-final-overrides">
+html,body{width:100%;min-height:100%;margin:0!important}
+body{font-family:"Times New Roman",Times,serif!important;overflow-x:hidden}
+button,input,textarea,select{font-family:"Times New Roman",Times,serif!important}
+.app-shell{width:100%!important;max-width:none!important;margin:0!important;min-height:100dvh!important}
+.main-scroll{width:100%!important}
+.main-scroll.login-mode{height:100dvh!important;width:100%!important;padding:0!important}
+#login{width:100%!important;min-height:100dvh!important;margin:0!important;padding:48px 32px 72px!important;display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important}
+#login>.glass{width:min(760px,calc(100vw - 64px))!important;margin:0 auto!important;padding:48px!important;box-sizing:border-box!important}
+#login h1{font-family:"Times New Roman",Times,serif!important;font-size:clamp(2.6rem,4vw,4rem)!important;line-height:1.05!important}
+#login p{font-family:"Times New Roman",Times,serif!important;font-size:1.3rem!important;line-height:1.5!important}
+#login-form{width:100%!important;max-width:680px!important;margin:34px auto 0!important}
+#login-form .field,#login-form button{width:100%!important;min-height:66px!important;box-sizing:border-box!important;font-size:1.25rem!important}
+#login-form .field{padding:0 20px!important}
+#login-form button{font-weight:700!important}
+#login-input::placeholder{font-size:1.15rem!important;opacity:.68}
+@media(max-width:899px){#login{padding:28px 18px 90px!important}#login>.glass{width:100%!important;padding:32px 24px!important}#login-form .field,#login-form button{min-height:60px!important;font-size:1.12rem!important}}
+</style></head>
 <body><div class="water-layer"><span class="water-drop"></span><span class="water-drop"></span><span class="water-drop"></span><span class="drop-ripple" style="left:24%;top:28%"></span><span class="drop-ripple" style="right:20%;top:67%;animation-delay:1.1s"></span></div>
 <div class="app-shell">
 <header id="header" class="hidden h-[72px] px-4 flex items-center justify-between glass border-0 border-b rounded-none relative z-20">
@@ -243,7 +260,7 @@ button{min-height:44px;}
     <h1 class="text-3xl font-extrabold text-center tracking-tight">Karuthu</h1>
     <p class="text-center text-gray-500 text-sm mt-2">A place for people, ideas, conversations, and communities.</p>
     <form id="login-form" class="mt-8 space-y-3">
-      <input id="login-input" class="field" placeholder="Choose a username" autocomplete="off" required>
+      <input id="login-input" class="field" placeholder="What should we call you?" autocomplete="off" required>
       <button class="primary w-full py-3.5 rounded-2xl font-bold" type="submit">Enter Karuthu <i class="fas fa-arrow-right ml-1"></i></button>
       <p id="login-error" class="text-center text-xs text-rose-500 hidden"></p>
     </form>
@@ -360,8 +377,8 @@ function notify(targetId,type,text,postId="",chatId=""){if(!targetId||targetId==
 let authReadyResolve;const authReady=new Promise(resolve=>{authReadyResolve=resolve});
 try{app=initializeApp(firebaseConfig);auth=getAuth(app);db=getFirestore(app);storage=getStorage(app);const cred=await signInAnonymously(auth);currentUser=cred.user;authReadyResolve(currentUser);onAuthStateChanged(auth,u=>{currentUser=u;if(u)authReadyResolve(u)})}catch(e){console.error(e);authReadyResolve(null);document.getElementById("login-error").textContent="Firebase connection failed. Please refresh and try again.";document.getElementById("login-error").classList.remove("hidden")}
 
-document.getElementById("login-form").addEventListener("submit",async e=>{e.preventDefault();const input=document.getElementById("login-input"),btn=e.submitter||document.querySelector("#login-form button[type=submit]"),raw=input.value.trim(),id=raw.toLowerCase().replace(/[^a-z0-9_]/g,"");const err=document.getElementById("login-error");if(!id){err.textContent="Please enter a username.";err.classList.remove("hidden");return}err.classList.add("hidden");if(btn){btn.disabled=true;btn.dataset.originalText=btn.innerHTML;btn.innerHTML="Entering Karuthu <i class="fas fa-spinner fa-spin ml-1"></i>"}try{if(!currentUser)currentUser=await Promise.race([authReady,new Promise(r=>setTimeout(()=>r(null),8000))]);if(!currentUser)throw new Error("Authentication is not ready");const s=await getDoc(dref("profiles",id));if(s.exists())activeProfile={id:s.id,...s.data()};else{activeProfile={id,username:raw,bio:"",profilePicUrl:"",following:[],followers:[],joinedAt:Date.now(),lastSeen:Date.now(),online:true};await setDoc(dref("profiles",id),activeProfile)}
-document.getElementById("header").classList.remove("hidden");document.getElementById("nav").classList.remove("hidden");document.getElementById("control-center").classList.remove("hidden");updateHeader();subscribe();switchView("feed");toast("Welcome to Karuthu")}catch(err){console.error(err);err=document.getElementById("login-error");err.textContent=err?.message||"Could not enter Karuthu. Please try again.";err.classList.remove("hidden");toast("Could not enter Karuthu",false)}finally{if(btn){btn.disabled=false;btn.innerHTML=btn.dataset.originalText||"Enter Karuthu <i class="fas fa-arrow-right ml-1"></i>"}}});
+document.getElementById("login-form").addEventListener("submit",async e=>{e.preventDefault();const input=document.getElementById("login-input"),btn=e.submitter||document.querySelector("#login-form button[type=submit]"),raw=input.value.trim(),id=raw.toLowerCase().replace(/[^a-z0-9_]/g,"");const err=document.getElementById("login-error");if(!id){err.textContent="Please enter a username.";err.classList.remove("hidden");return}err.classList.add("hidden");if(btn){btn.disabled=true;btn.dataset.originalText=btn.innerHTML;btn.innerHTML='Entering Karuthu <i class="fas fa-spinner fa-spin ml-1"></i>'}try{if(!currentUser)currentUser=await Promise.race([authReady,new Promise(r=>setTimeout(()=>r(null),8000))]);if(!currentUser)throw new Error("Authentication is not ready");const s=await getDoc(dref("profiles",id));if(s.exists())activeProfile={id:s.id,...s.data()};else{activeProfile={id,username:raw,bio:"",profilePicUrl:"",following:[],followers:[],joinedAt:Date.now(),lastSeen:Date.now(),online:true};await setDoc(dref("profiles",id),activeProfile)}
+document.getElementById("header").classList.remove("hidden");document.getElementById("nav").classList.remove("hidden");document.getElementById("control-center").classList.remove("hidden");updateHeader();subscribe();switchView("feed");toast("Welcome to Karuthu")}catch(error){console.error(error);const loginError=document.getElementById("login-error");loginError.textContent=error?.message||"Could not enter Karuthu. Please try again.";loginError.classList.remove("hidden");toast("Could not enter Karuthu",false)}finally{if(btn){btn.disabled=false;btn.innerHTML=btn.dataset.originalText||"Enter Karuthu <i class="fas fa-arrow-right ml-1"></i>"}}});
 
 function updateHeader(){const el=document.getElementById("header-avatar");if(el){if(activeProfile.profilePicUrl)el.innerHTML=`<img src="${esc(activeProfile.profilePicUrl)}" class="avatar w-10 h-10">`;else el.innerHTML=esc((activeProfile.username||"?")[0].toUpperCase())}document.getElementById("header-user").textContent="@"+activeProfile.username}
 function subscribe(){
