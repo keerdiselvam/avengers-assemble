@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nexus Analytics</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; 
+            margin: 0;
+            padding: 0;
+            overscroll-behavior-y: none;
+        }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
+        .view-layer { transition: opacity 0.2s ease-in-out; }
+    </style>
+</head>
+<body class="flex justify-center min-h-screen m-0 p-0 overflow-hidden">
+
+    <div class="w-full max-w-md bg-gray-50 flex flex-col h-[100dvh] relative shadow-2xl overflow-hidden">
+        
+        <!-- App Header -->
+        <header id="app-header" class="hidden bg-white px-4 py-3 border-b flex items-center justify-between sticky top-0 z-20 shadow-sm shrink-0">
+            <div class="font-bold text-xl text-blue-600 tracking-tight flex items-center gap-2">
+                <i class="fas fa-chart-network text-blue-500"></i> Nexus
+            </div>
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center gap-2 cursor-pointer" id="profile-btn" title="Change Profile Picture">
+                    <img id="header-avatar" src="" class="w-8 h-8 rounded-full bg-blue-100 object-cover border border-gray-200 hidden" alt="Avatar">
+                    <div id="header-initial" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold shadow-sm"></div>
+                    <span id="current-username" class="text-sm font-medium text-gray-600 hover:text-blue-600">@username</span>
+                </div>
+                <input type="file" id="profile-pic-input" accept="image/*" class="hidden" />
+                <button id="logout-btn" class="p-2 text-gray-400 hover:text-red-500 transition-colors bg-gray-100 rounded-full flex items-center justify-center">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="flex-1 overflow-y-auto relative hide-scrollbar">
+            
+            <!-- Login View -->
+            <div id="view-login" class="view-layer flex flex-col items-center justify-center min-h-full p-6 bg-gradient-to-b from-blue-50 to-white">
+                <div class="w-full bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+                    <div class="text-center mb-8">
+                        <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg text-2xl">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-900">Nexus Analytics</h1>
+                        <p class="text-gray-500 text-sm mt-2">Mock Social Data Platform</p>
+                    </div>
+                    
+                    <form id="login-form" class="space-y-4">
+                        <div id="login-error" class="hidden text-red-500 text-sm text-center bg-red-50 p-2 rounded-lg"></div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" id="login-input" placeholder="e.g. john_doe" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none" />
+                        </div>
+                        <button type="submit" id="login-btn" disabled
+                            class="w-full bg-gray-400 text-white font-semibold py-3 rounded-xl transition-colors shadow-md flex items-center justify-center gap-2 cursor-not-allowed">
+                            <i class="fas fa-spinner fa-spin" id="login-spinner"></i>
+                            <span id="login-btn-text">Connecting to Server...</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Feed View -->
+            <div id="view-feed" class="view-layer hidden p-3 sm:p-4 pb-24 space-y-4 relative">
+                <!-- Room Header indicator (if inside a room) -->
+                <div id="active-room-banner" class="hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-3 rounded-xl shadow-md flex justify-between items-center cursor-pointer hover:shadow-lg transition-all" onclick="exitRoom()">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider opacity-80">Currently in Room</span>
+                        <div id="active-room-name" class="font-bold text-lg leading-tight">Room Name</div>
+                    </div>
+                    <div class="bg-white/20 px-3 py-1.5 rounded-lg text-sm flex items-center gap-2">
+                        <i class="fas fa-sign-out-alt"></i> Leave Room
+                    </div>
+                </div>
+                
+                <div id="feed-container" class="space-y-4">
+                    <div class="text-center py-12 text-gray-500 flex flex-col items-center">
+                        <i class="fas fa-circle-notch fa-spin text-3xl mb-4 text-gray-300"></i>
+                        <p>Loading posts...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rooms View -->
+            <div id="view-rooms" class="view-layer hidden p-3 sm:p-4 pb-24 space-y-4 relative">
+                <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                    <h2 class="text-xl font-bold text-gray-800 mb-2">Community Rooms</h2>
+                    <p class="text-sm text-gray-500 mb-4">Join a topic-specific room or create your own to share targeted posts.</p>
+                    <div class="flex gap-2 mb-4">
+                        <input type="text" id="new-room-input" placeholder="New room name..." class="flex-1 border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                        <button onclick="createRoom()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700">Create</button>
+                    </div>
+                </div>
+                <div id="rooms-container" class="space-y-3">
+                    <!-- Rooms injected here -->
+                </div>
+            </div>
+
+            <!-- Global Chat View -->
+            <div id="view-chat" class="view-layer hidden flex flex-col h-full bg-gray-50 relative">
+                <div class="bg-white border-b px-4 py-2 shadow-sm sticky top-0 z-10 text-center font-bold text-gray-700 text-sm">
+                    <i class="fas fa-globe-americas text-blue-500"></i> Global Lounge
+                </div>
+                <div id="chat-container" class="flex-1 overflow-y-auto p-4 space-y-3 pb-20"></div>
+                <div class="sticky bottom-0 w-full bg-white border-t p-3 shadow-lg z-10">
+                    <form id="chat-form" class="flex items-center space-x-2">
+                        <input type="text" id="chat-input" placeholder="Message global..." autocomplete="off" class="flex-1 bg-gray-100 px-4 py-2.5 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                        <button type="submit" class="bg-blue-600 text-white p-2.5 rounded-full hover:bg-blue-700 transition-colors w-10 h-10 flex items-center justify-center">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Network View -->
+            <div id="view-network" class="view-layer hidden p-3 sm:p-4 pb-24 space-y-3">
+                <div class="bg-white p-4 rounded-xl border shadow-sm mb-4 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-bold text-gray-800 mb-1">Your Network</h2>
+                        <p id="network-stats" class="text-sm text-gray-500">Following: 0 | Followers: 0</p>
+                    </div>
+                    <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                <div id="network-container" class="space-y-3"></div>
+            </div>
+
+            <!-- Post Creation View -->
+            <div id="view-post" class="view-layer hidden p-3 sm:p-4 pb-24">
+                <div class="bg-white rounded-xl shadow-sm border p-4 space-y-4">
+                    <h2 class="text-xl font-bold text-gray-800 border-b pb-2">Create New Post</h2>
+                    
+                    <!-- Dynamic Posting Destination Indicator -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Posting To</label>
+                        <div id="post-destination-label" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 font-semibold flex items-center gap-2 shadow-inner">
+                            <i class="fas fa-globe-americas text-blue-500"></i> Global Feed
+                        </div>
+                    </div>
+                    
+                    <div id="drop-zone" class="w-full border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center justify-center bg-gray-50 relative hover:bg-gray-100 transition-colors cursor-pointer min-h-[160px]">
+                        <div id="media-preview-container" class="hidden relative w-full flex justify-center">
+                            <div id="media-wrapper" class="w-full flex justify-center"></div>
+                            <button type="button" id="remove-media-btn" class="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center shadow-lg hover:bg-red-600 z-10">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="upload-prompt" class="flex flex-col items-center">
+                            <i class="fas fa-photo-video text-4xl text-blue-400 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Click to upload Image or Video</p>
+                        </div>
+                        <input type="file" id="media-input" accept="image/*,video/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                        <textarea id="post-desc" placeholder="What's on your mind?" rows="4" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Hashtags (space or comma separated)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fas fa-hashtag text-gray-400"></i></div>
+                            <input type="text" id="post-tags" placeholder="tech news gaming" class="w-full pl-8 pr-3 py-2 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+                    </div>
+
+                    <button id="submit-post-btn" class="w-full bg-blue-600 text-white font-bold py-3 rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-md flex items-center justify-center gap-2">
+                        <i class="fas fa-paper-plane"></i> Publish Post
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Navigation -->
+        <nav id="bottom-nav" class="hidden bg-white border-t border-gray-200 px-2 flex justify-around items-center pb-safe shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)] z-20 shrink-0 h-[64px]">
+            <button data-view="feed" class="nav-btn p-2 flex flex-col items-center space-y-1 text-blue-600 w-16">
+                <i class="fas fa-home text-xl"></i><span class="text-[10px] font-medium">Feed</span>
+            </button>
+            <button data-view="rooms" class="nav-btn p-2 flex flex-col items-center space-y-1 text-gray-400 w-16">
+                <i class="fas fa-layer-group text-xl"></i><span class="text-[10px] font-medium">Rooms</span>
+            </button>
+            <div class="relative w-16 flex justify-center">
+                <button data-view="post" class="nav-btn absolute -top-8 flex flex-col items-center bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 w-14 h-14 justify-center ring-4 ring-gray-50">
+                    <i class="fas fa-plus text-xl"></i>
+                </button>
+            </div>
+            <button data-view="network" class="nav-btn p-2 flex flex-col items-center space-y-1 text-gray-400 w-16">
+                <i class="fas fa-users text-xl"></i><span class="text-[10px] font-medium">Network</span>
+            </button>
+            <button data-view="chat" class="nav-btn p-2 flex flex-col items-center space-y-1 text-gray-400 w-16">
+                <i class="fas fa-comment-dots text-xl"></i><span class="text-[10px] font-medium">Chat</span>
+            </button>
+        </nav>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCJaDrE-Ex9DxyV6Hw_-5NAQk3XY4lPTvY",
+            authDomain: "avengers-assemble-b97f5.firebaseapp.com",
+            projectId: "avengers-assemble-b97f5",
+            storageBucket: "avengers-assemble-b97f5.firebasestorage.app",
+            messagingSenderId: "1055143035893",
+            appId: "1:1055143035893:web:77673867994d3941c396bc"
+        };
+        
+        const appId = 'sih-mock-app-html';
+        
+        let app, auth, db, storage;
+        let currentUser = null, activeProfile = null, currentView = 'login', currentRoomId = 'global';
+        let profilesData = [], postsData = [], messagesData = [], roomsData = [];
+        let currentMediaFile = null;
+
+        let unsubProfiles, unsubPosts, unsubMessages, unsubRooms;
+
+        const commonEmojis = ['😀','😂','❤️','🔥','👍','🎉','😢','🙌','👀','✨'];
+
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            storage = getStorage(app);
+            setupAuthentication();
+        } catch (error) {
+            showLoginError("Failed to initialize database connection.");
+        }
+
+        async function setupAuthentication() {
+            try {
+                await signInAnonymously(auth);
+                onAuthStateChanged(auth, (user) => {
+                    currentUser = user;
+                    const loginBtn = document.getElementById('login-btn');
+                    if (user) {
+                        loginBtn.disabled = false;
+                        loginBtn.classList.replace('bg-gray-400', 'bg-blue-600');
+                        document.getElementById('login-spinner').classList.add('hidden');
+                        document.getElementById('login-btn-text').textContent = "Enter Platform";
+                    } else if(activeProfile) logout();
+                });
+            } catch (err) { showLoginError("Authentication failed securely."); }
+        }
+
+        const views = {
+            login: document.getElementById('view-login'),
+            feed: document.getElementById('view-feed'),
+            rooms: document.getElementById('view-rooms'),
+            chat: document.getElementById('view-chat'),
+            network: document.getElementById('view-network'),
+            post: document.getElementById('view-post')
+        };
+
+        function switchView(viewName) {
+            currentView = viewName;
+            Object.values(views).forEach(v => v.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+
+            const header = document.getElementById('app-header');
+            const bottomNav = document.getElementById('bottom-nav');
+
+            if (viewName === 'login') {
+                header.classList.add('hidden');
+                bottomNav.classList.add('hidden');
+            } else {
+                header.classList.remove('hidden');
+                bottomNav.classList.remove('hidden');
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    if (btn.dataset.view) {
+                        btn.classList.toggle('text-blue-600', btn.dataset.view === viewName && viewName !== 'post');
+                        btn.classList.toggle('text-gray-400', btn.dataset.view !== viewName && viewName !== 'post');
+                    }
+                });
+                
+                if (viewName === 'feed') renderFeed(); 
+                if (viewName === 'chat') scrollToBottom(document.getElementById('chat-container'));
+                else document.getElementById('main-content').scrollTop = 0;
+            }
+        }
+
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => { if(btn.dataset.view) switchView(btn.dataset.view); });
+        });
+
+        function showLoginError(msg) {
+            const errDiv = document.getElementById('login-error');
+            errDiv.textContent = msg; errDiv.classList.remove('hidden');
+        }
+
+        function getCollectionPath(colName) { return collection(db, 'artifacts', appId, 'public', 'data', colName); }
+        function getDocPath(colName, docId) { return doc(db, 'artifacts', appId, 'public', 'data', colName, docId); }
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('login-input').value.trim();
+            const cleanId = input.toLowerCase().replace(/[^a-z0-9_]/g, ''); 
+            
+            if (!currentUser || !cleanId) return showLoginError(currentUser ? "Invalid username" : "Connecting...");
+
+            document.getElementById('login-btn').disabled = true;
+            document.getElementById('login-error').classList.add('hidden');
+
+            try {
+                const profileRef = getDocPath('profiles', cleanId);
+                const snap = await getDoc(profileRef);
+                
+       
