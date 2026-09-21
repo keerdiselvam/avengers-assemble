@@ -228,7 +228,7 @@
             apiKey: "AIzaSyCJaDrE-Ex9DxyV6Hw_-5NAQk3XY4lPTvY",
             authDomain: "avengers-assemble-b97f5.firebaseapp.com",
             projectId: "avengers-assemble-b97f5",
-            storageBucket: "avengers-assemble-b97f5.firebasestorage.app",
+            storageBucket: "avengers-assemble-b97f5.appspot.com",
             messagingSenderId: "1055143035893",
             appId: "1:1055143035893:web:77673867994d3941c396bc"
         };
@@ -620,6 +620,15 @@
         const uploadPrompt = document.getElementById('upload-prompt');
         const removeMediaBtn = document.getElementById('remove-media-btn');
 
+        function clearMedia() {
+            currentMediaFile = null;
+            mediaWrapper.innerHTML = '';
+            mediaContainer.classList.add('hidden');
+            uploadPrompt.classList.remove('hidden');
+            mediaInput.classList.remove('hidden');
+            mediaInput.value = ''; 
+        }
+
         mediaInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -639,12 +648,7 @@
         
         removeMediaBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            currentMediaFile = null;
-            mediaWrapper.innerHTML = '';
-            mediaContainer.classList.add('hidden');
-            uploadPrompt.classList.remove('hidden');
-            mediaInput.classList.remove('hidden');
-            mediaInput.value = ''; 
+            clearMedia();
         });
 
         document.getElementById('submit-post-btn').addEventListener('click', async () => {
@@ -679,7 +683,7 @@
                 
                 document.getElementById('post-desc').value = '';
                 document.getElementById('post-tags').value = '';
-                removeMediaBtn.click();
+                clearMedia();
                 
                 if (roomId !== 'global') enterRoom(roomId, roomsData.find(r=>r.id===roomId)?.name || 'Room');
                 else switchView('feed');
