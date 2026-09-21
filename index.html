@@ -161,11 +161,11 @@
                             </button>
                         </div>
                         <div id="upload-prompt" class="flex flex-col items-center">
-                            <i class="fas fa-photo-video text-4xl text-blue-400 mb-2"></i>
-                            <p class="text-sm font-medium text-gray-700">Click to upload Image or Video</p>
-                            <p class="text-xs text-gray-500 mt-1">Videos should be short</p>
+                            <i class="fas fa-cloud-upload-alt text-4xl text-blue-400 mb-2"></i>
+                            <p class="text-sm font-medium text-gray-700">Click to upload an image</p>
+                            <p class="text-xs text-gray-500 mt-1">Images will be compressed automatically</p>
                         </div>
-                        <input type="file" id="media-input" accept="image/*,video/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <input type="file" id="media-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
                     </div>
 
                     <div>
@@ -222,7 +222,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, addDoc, deleteDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCJaDrE-Ex9DxyV6Hw_-5NAQk3XY4lPTvY",
@@ -235,10 +234,10 @@
         
         const appId = 'sih-mock-app-html';
         
-        let app, auth, db, storage;
+        let app, auth, db;
         let currentUser = null, activeProfile = null, currentView = 'login', currentRoomId = 'global';
         let profilesData = [], postsData = [], messagesData = [], roomsData = [];
-        let currentMediaFile = null;
+        let currentImageBase64 = null;
 
         let unsubProfiles, unsubPosts, unsubMessages, unsubRooms;
 
@@ -248,7 +247,6 @@
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
-            storage = getStorage(app);
             setupAuthentication();
         } catch (error) {
             showLoginError("Failed to initialize database connection.");
@@ -363,14 +361,17 @@
         document.getElementById('profile-btn').addEventListener('click', () => document.getElementById('profile-pic-input').click());
         document.getElementById('profile-pic-input').addEventListener('change', async (e) => {
             const file = e.target.files[0];
-            if(!file) return;
+            if(!file || !file.type.startsWith('image/')) return;
             try {
-                const url = await uploadToStorage(file, `profiles/${activeProfile.id}_${Date.now()}`);
-                await updateDoc(getDocPath('profiles', activeProfile.id), { profilePicUrl: url });
-                activeProfile.profilePicUrl = url;
+                const base64Url = await compressImage(file, 300); // small square-ish avatar
+                await updateDoc(getDocPath('profiles', activeProfile.id), { profilePicUrl: base64Url });
+                activeProfile.profilePicUrl = base64Url;
                 updateHeaderProfile();
                 renderFeed();
-            } catch(err) { alert("Failed to upload profile picture."); }
+            } catch(err) {
+                console.error("Profile pic error:", err);
+                alert("Failed to upload profile picture.");
+            }
         });
 
         function logout() {
@@ -607,45 +608,79 @@
             }
         };
 
-        // --- MEDIA UPLOAD (Storage) ---
-        async function uploadToStorage(file, path) {
-            const storageRef = ref(storage, path);
-            await uploadBytes(storageRef, file);
-            return await getDownloadURL(storageRef);
-        }
+        // --- MEDIA HANDLING (client-side compress -> base64, embedded in Firestore doc) ---
+        // No Firebase Storage involved at all, so there's no bucket/rules/plan step that can hang.
+        const compressImage = (file, maxDim = 700, quality = 0.6) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('Could not read file'));
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('Could not load image'));
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        if (width > height) {
+                            if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+                        } else {
+                            if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+
+                        const ctx = canvas.getContext('2d');
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.fillRect(0, 0, width, height);
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                };
+            });
+        };
 
         const mediaInput = document.getElementById('media-input');
         const mediaWrapper = document.getElementById('media-wrapper');
         const mediaContainer = document.getElementById('media-preview-container');
         const uploadPrompt = document.getElementById('upload-prompt');
         const removeMediaBtn = document.getElementById('remove-media-btn');
+        const uploadPromptDefaultHtml = uploadPrompt.innerHTML;
 
         function clearMedia() {
-            currentMediaFile = null;
+            currentImageBase64 = null;
             mediaWrapper.innerHTML = '';
             mediaContainer.classList.add('hidden');
             uploadPrompt.classList.remove('hidden');
+            uploadPrompt.innerHTML = uploadPromptDefaultHtml;
             mediaInput.classList.remove('hidden');
-            mediaInput.value = ''; 
+            mediaInput.value = '';
         }
 
-        mediaInput.addEventListener('change', (e) => {
+        mediaInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
-            if (!file) return;
-            currentMediaFile = file;
-            
-            const url = URL.createObjectURL(file);
-            if(file.type.startsWith('video/')) {
-                mediaWrapper.innerHTML = `<video src="${url}" controls class="max-h-64 rounded shadow"></video>`;
-            } else {
-                mediaWrapper.innerHTML = `<img src="${url}" class="max-h-64 rounded shadow object-contain" />`;
+            if (!file || !file.type.startsWith('image/')) return;
+
+            uploadPrompt.innerHTML = `<i class="fas fa-spinner fa-spin text-3xl text-blue-400 mb-2"></i><p class="text-sm font-medium">Processing...</p>`;
+
+            try {
+                currentImageBase64 = await compressImage(file);
+                mediaWrapper.innerHTML = `<img src="${currentImageBase64}" class="max-h-64 rounded shadow object-contain" />`;
+                mediaContainer.classList.remove('hidden');
+                uploadPrompt.classList.add('hidden');
+                mediaInput.classList.add('hidden');
+            } catch (err) {
+                console.error("Image processing error:", err);
+                alert("Couldn't process that image — try a different file.");
+            } finally {
+                uploadPrompt.innerHTML = uploadPromptDefaultHtml;
             }
-            
-            mediaContainer.classList.remove('hidden');
-            uploadPrompt.classList.add('hidden');
-            mediaInput.classList.add('hidden');
         });
-        
+
         removeMediaBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             clearMedia();
@@ -657,40 +692,33 @@
             const roomId = document.getElementById('post-room-select').value;
             const btn = document.getElementById('submit-post-btn');
 
-            if ((!desc.trim() && !currentMediaFile)) return;
+            if ((!desc.trim() && !currentImageBase64)) return;
 
             btn.disabled = true;
             btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Publishing...`;
 
             try {
-                let mediaUrl = null, mediaType = null;
-                if(currentMediaFile) {
-                    mediaType = currentMediaFile.type.startsWith('video/') ? 'video' : 'image';
-                    const ext = currentMediaFile.name.split('.').pop() || 'tmp';
-                    mediaUrl = await uploadToStorage(currentMediaFile, `posts/${activeProfile.id}_${Date.now()}.${ext}`);
-                }
-
                 await addDoc(getCollectionPath('posts'), {
                     authorId: activeProfile.id,
                     authorName: activeProfile.username,
                     description: desc.trim(),
                     hashtags: tags.split(',').map(t=>t.trim()).filter(t=>t),
-                    mediaUrl, mediaType,
+                    imageBase64: currentImageBase64,
                     likedBy: [], comments: [],
                     roomId,
                     createdAt: Date.now()
                 });
-                
+
                 document.getElementById('post-desc').value = '';
                 document.getElementById('post-tags').value = '';
                 clearMedia();
-                
+
                 if (roomId !== 'global') enterRoom(roomId, roomsData.find(r=>r.id===roomId)?.name || 'Room');
                 else switchView('feed');
 
             } catch (err) {
                 console.error("Posting error:", err);
-                alert("Failed to publish post.");
+                alert("Failed to publish post. The image may be too large — try a smaller one.");
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = `<i class="fas fa-paper-plane"></i> Publish Post`;
