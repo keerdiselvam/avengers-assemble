@@ -18,8 +18,6 @@ body:after{content:"";position:fixed;inset:0;z-index:-3;background:linear-gradie
 .water-drop:nth-child(1){left:-40px;top:18%;animation-delay:-6s}.water-drop:nth-child(2){right:-55px;top:48%;width:220px;height:220px;animation-delay:-13s}.water-drop:nth-child(3){left:35%;bottom:-80px;width:240px;height:240px;animation-delay:-18s}
 @keyframes ambientKaruthu{to{transform:translate3d(2%,1.5%,0) scale(1.035)}}
 @keyframes waterFloatKaruthu{0%,100%{transform:translate3d(0,0,0) scale(1) rotate(0deg)}50%{transform:translate3d(22px,-34px,0) scale(1.045) rotate(4deg)}}
-.drop-ripple{position:absolute;width:7px;height:7px;border-radius:50%;background:rgba(45,156,159,.55);box-shadow:0 0 0 0 rgba(45,156,159,.20);animation:dropRippleKaruthu 5.5s cubic-bezier(.2,.7,.2,1) infinite}
-@keyframes dropRippleKaruthu{0%{transform:scale(.7);box-shadow:0 0 0 0 rgba(45,156,159,.22);opacity:0}18%{opacity:.7}100%{transform:scale(1.1);box-shadow:0 0 0 70px rgba(45,156,159,0);opacity:0}}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(74,52,43,.18);border-radius:99px}
 button,input,textarea,select{font:inherit;font-size:1rem}button{transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s,background .3s;cursor:pointer}button:active{transform:scale(.96)}
 .glass{background:rgba(255,253,249,.88);border:1px solid rgba(74,52,43,.12);box-shadow:0 18px 55px rgba(69,48,37,.10),inset 0 1px rgba(255,255,255,.8);backdrop-filter:blur(18px) saturate(110%)}
@@ -44,7 +42,6 @@ button,input,textarea,select{font:inherit;font-size:1rem}button{transition:trans
 @keyframes toastIn{from{opacity:0;transform:translate(-50%,-20px)}to{opacity:1;transform:translate(-50%,0)}}
 .carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory}
 .carousel>*{min-width:100%;scroll-snap-align:start}
-.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5)}.dot.active{width:18px;background:#fff}
 .unread{min-width:17px;height:17px;padding:0 5px;border-radius:99px;background:#ff4f7b;color:white;font-size:9px;font-weight:800;display:grid;place-items:center}
 .feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .feature-tile{padding:14px;border-radius:20px;text-align:left;background:rgba(255,255,255,.62);border:1px solid rgba(74,52,43,.10);box-shadow:0 8px 24px rgba(69,48,37,.07)}
@@ -65,7 +62,6 @@ button,input,textarea,select{font:inherit;font-size:1rem}button{transition:trans
 .nav .fab{position:static;width:58px;height:58px;border-radius:18px;border:4px solid #f4eee6;background:linear-gradient(145deg,#7d2f3a,#167c80);color:white;box-shadow:0 14px 30px rgba(22,124,128,.24);display:grid;place-items:center;font-size:20px}
 .chat-compose{display:flex;gap:8px;align-items:center;margin-top:8px}
 .chat-compose .field{min-width:0;flex:1}
-.chat-media-btn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;cursor:pointer;flex:none}
 @media(min-width:900px){
   #header{padding-left:250px!important;padding-right:34px!important}
   .main-scroll{padding-left:240px!important;padding-right:24px!important;padding-top:80px}
@@ -81,25 +77,26 @@ button,input,textarea,select{font:inherit;font-size:1rem}button{transition:trans
   .nav .nav-btn{width:70px}
 }
 
-/* ================= GOD MODE SANCTUM HUD ================= */
-body.god-mode{--god-bg:#040209;--god-gold:#ffd15c;--god-cyan:#00f5d4;--god-violet:#a855f7;background:#040209!important;color:#f8f9fa!important}
-body.god-mode:before{background:radial-gradient(circle at 10% 10%,rgba(168,85,247,.22),transparent 24%),radial-gradient(circle at 90% 15%,rgba(255,209,92,.18),transparent 26%),radial-gradient(circle at 50% 90%,rgba(0,245,212,.12),transparent 30%),linear-gradient(135deg,#040209,#0e071a 55%,#05020c)!important;animation:godAmbient 16s ease-in-out infinite alternate!important}
-body.god-mode .glass{background:linear-gradient(145deg,rgba(22,12,38,.92),rgba(10,5,20,.94))!important;border:1px solid rgba(255,209,92,.22)!important;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 20px rgba(168,85,247,.1)!important;color:#f8f9fa}
-body.god-mode .glass-soft{background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,209,92,.14)!important;color:#f3e8ff}
-body.god-mode .field{background:rgba(255,255,255,.06)!important;border-color:rgba(255,209,92,.25)!important;color:#fff!important}
-body.god-mode .field:focus{border-color:var(--god-cyan)!important;box-shadow:0 0 0 4px rgba(0,245,212,.15)!important}
-body.god-mode .primary{background:linear-gradient(135deg,#9333ea,#2563eb)!important;box-shadow:0 10px 30px rgba(147,51,234,.35)!important;color:#fff}
-body.god-mode .secondary{background:rgba(255,255,255,.08)!important;border-color:rgba(255,209,92,.22)!important;color:#f3e8ff!important}
-body.god-mode .control-center{background:rgba(12,6,24,.95)!important;border-color:rgba(255,209,92,.25)!important}
+/* ================= GODS EYE HUD ================= */
+body.god-mode{--god-bg:#030108;--god-gold:#ffcf54;--god-cyan:#00f0ff;--god-violet:#8a2be2;background:var(--god-bg)!important;color:#fff!important}
+body.god-mode:before{background:radial-gradient(circle at 10% 10%,rgba(138,43,226,.22),transparent 24%),radial-gradient(circle at 90% 15%,rgba(255,207,84,.18),transparent 26%),radial-gradient(circle at 50% 90%,rgba(0,240,255,.12),transparent 30%),linear-gradient(135deg,#030108,#0e071a 55%,#05020c)!important;animation:godAmbient 16s ease-in-out infinite alternate!important}
+body.god-mode .glass{background:linear-gradient(145deg,rgba(22,12,38,.92),rgba(10,5,20,.94))!important;border:1px solid rgba(255,207,84,.22)!important;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 20px rgba(138,43,226,.1)!important;color:#fff}
+body.god-mode .glass-soft{background:rgba(255,255,255,.05)!important;border:1px solid rgba(255,207,84,.14)!important;color:#f3e8ff}
+body.god-mode .field{background:rgba(255,255,255,.06)!important;border-color:rgba(255,207,84,.25)!important;color:#fff!important}
+body.god-mode .field:focus{border-color:var(--god-cyan)!important;box-shadow:0 0 0 4px rgba(0,240,255,.15)!important}
+body.god-mode .primary{background:linear-gradient(135deg,#8a2be2,#2563eb)!important;box-shadow:0 10px 30px rgba(138,43,226,.35)!important;color:#fff}
+body.god-mode .secondary{background:rgba(255,255,255,.08)!important;border-color:rgba(255,207,84,.22)!important;color:#f3e8ff!important}
+body.god-mode .control-center{background:rgba(12,6,24,.95)!important;border-color:rgba(255,207,84,.25)!important}
 body.god-mode .control-item{color:#e9d5ff!important}
 body.god-mode .control-item i{color:var(--god-cyan)!important}
-body.god-mode .nav-inner{background:rgba(12,6,24,.96)!important;border-color:rgba(255,209,92,.25)!important}
-body.god-mode .nav-btn.active{color:var(--god-gold)!important;background:rgba(255,209,92,.1)!important}
-body.god-mode .fab{background:linear-gradient(145deg,var(--god-gold),#9333ea)!important;border-color:#120722!important;box-shadow:0 0 35px rgba(255,209,92,.35)!important}
-.god-hero{padding:20px;border-radius:24px;background:linear-gradient(135deg,rgba(147,51,234,.35),rgba(4,2,9,.95));border:1px solid var(--god-gold);box-shadow:inset 0 0 25px rgba(168,85,247,.25),0 15px 40px rgba(0,0,0,.5);display:flex;align-items:center;gap:18px}
-.god-hero-icon{width:64px;height:64px;border-radius:20px;background:radial-gradient(circle at 35% 30%,#fff5cc,var(--god-gold) 45%,#9333ea 90%);color:#120722;display:grid;place-items:center;font-size:28px;box-shadow:0 0 30px rgba(255,209,92,.45)}
+body.god-mode .nav-inner{background:rgba(12,6,24,.96)!important;border-color:rgba(255,207,84,.25)!important}
+body.god-mode .nav-btn.active{color:var(--god-gold)!important;background:rgba(255,207,84,.1)!important}
+body.god-mode .fab{background:linear-gradient(145deg,var(--god-gold),#8a2be2)!important;border-color:#120722!important;box-shadow:0 0 35px rgba(255,207,84,.35)!important}
+.god-hero{padding:20px;border-radius:24px;background:linear-gradient(135deg,rgba(138,43,226,.35),rgba(3,1,8,.95));border:1px solid var(--god-gold);box-shadow:inset 0 0 25px rgba(138,43,226,.25),0 15px 40px rgba(0,0,0,.5);display:flex;align-items:center;gap:18px}
+.god-hero-icon{width:64px;height:64px;border-radius:20px;background:radial-gradient(circle at 35% 30%,#fff5cc,var(--god-gold) 45%,#8a2be2 90%);color:#120722;display:grid;place-items:center;font-size:28px;box-shadow:0 0 30px rgba(255,207,84,.45)}
 .god-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
-.god-stat{background:rgba(255,255,255,.04);border-radius:18px;border:1px solid rgba(255,209,92,.18);padding:14px;text-align:center;box-shadow:inset 0 0 15px rgba(255,255,255,.02)}
+.god-stat{background:rgba(255,255,255,.04);border-radius:18px;border:1px solid rgba(255,207,84,.18);padding:14px;text-align:center;box-shadow:inset 0 0 15px rgba(255,255,255,.02);transition:.3s}
+.god-stat:hover{transform:scale(1.02);box-shadow:0 4px 25px rgba(0,240,255,.3)}
 .god-stat b{display:block;font-size:1.6rem;color:var(--god-gold);font-weight:900}
 .god-stat span{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#c084fc}
 @keyframes godAmbient{to{transform:scale(1.04) translate3d(2%,1%,0)}}
@@ -186,7 +183,7 @@ body.god-mode .fab{background:linear-gradient(145deg,var(--god-gold),#9333ea)!im
   <button class="control-item" onclick="openSearch()"><i class="fas fa-magnifying-glass"></i><span>Search</span></button>
   <button class="control-item" onclick="showNotifications()"><i class="far fa-bell"></i><span>Notifications</span><span id="cc-notif-badge" class="unread hidden ml-auto">0</span></button>
   <button class="control-item" onclick="openSavedLibrary()"><i class="far fa-bookmark"></i><span>Saved</span></button>
-  <button id="god-control-item" class="control-item hidden" onclick="openGodConsole()"><i class="fas fa-crown"></i><span>God Console</span></button>
+  <button id="god-control-item" class="control-item hidden" onclick="openGodConsole()"><i class="fas fa-eye"></i><span>Gods Eye</span></button>
   <button class="control-item" onclick="openAccountCenter()"><i class="fas fa-gear"></i><span>Account</span></button>
 </aside>
 
@@ -487,13 +484,22 @@ function renderRoomFeed(roomId){
   const room=rooms.find(r=>r.id===roomId);
   const box=document.getElementById("feed-container");if(!room||!box)return;
   box.innerHTML=`<div class="glass card p-4"><div class="flex items-center gap-3 border-b pb-3"><div class="avatar w-10 h-10 rounded-xl"><i class="fas fa-${room.private?'lock':'hashtag'}"></i></div><div class="flex-1"><h2 class="text-lg font-extrabold">${esc(room.name)}</h2><div class="text-xs text-gray-500">${room.private?'Private':'Public'} Room Chat</div></div><button class="secondary px-3 py-1.5 rounded-xl text-xs font-bold" onclick="openRoomDetails('${roomId}')">Info</button></div><div id="room-feed-chat" class="room-feed-chat max-h-[55dvh] overflow-auto py-4 space-y-2"></div><div class="chat-compose"><input id="room-feed-input" class="field py-2.5" placeholder="Message room…" autocomplete="off"><button id="room-feed-send" class="primary w-11 h-11 rounded-2xl" onclick="sendRoomMessage('${roomId}')"><i class="fas fa-paper-plane text-xs"></i></button></div></div>`;
+  
   onSnapshot(col('roomMessages'),snap=>{
     const chat=document.getElementById('room-feed-chat');if(!chat)return;
     const list=snap.docs.map(x=>({id:x.id,...x.data()})).filter(m=>m.roomId===roomId && (isGod()||!(rooms.find(r=>r.id===roomId)?.hiddenMembers||[]).includes(m.authorId))).sort((a,b)=>a.createdAt-b.createdAt);
+    
     chat.innerHTML=list.map(m=>{
       const p=profileById(m.authorId);
       const isMine=m.authorId===activeProfile.id;
-      return `<div class="flex ${isMine?'justify-end':'justify-start'}"><div class="${isMine?'primary':'glass-soft'} max-w-[85%] rounded-2xl px-3 py-2 text-xs"><b>${esc(p.username)}</b><div class="mt-0.5 text-sm">${esc(m.text||'')}</div><div class="text-[8px] opacity-60 text-right mt-1">${new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div></div></div>`;
+      return `<div class="flex ${isMine?'justify-end':'justify-start'}">
+        <div class="${isMine?'primary':'glass-soft'} max-w-[85%] rounded-2xl px-3 py-2 text-xs relative group">
+          <b>${esc(p.username)}</b>
+          <div class="mt-0.5 text-sm">${esc(m.text||'')}</div>
+          <div class="text-[8px] opacity-60 text-right mt-1">${new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+          ${isGod() ? `<button class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" onclick="godDelMsg('${m.id}','roomMessages')" title="God Delete">×</button>` : ''}
+        </div>
+      </div>`;
     }).join('')||'<div class="text-center text-xs text-gray-400 py-10">Room is quiet. Say hello!</div>';
     chat.scrollTop=chat.scrollHeight;
   });
@@ -697,15 +703,15 @@ function updateGodUI(){
   document.body.classList.toggle("god-mode",g);
 }
 
-/* ================= GOD MODE SANCTUM HUD ENGINE ================= */
+/* ================= GODS EYE SANCTUM HUD ENGINE ================= */
 window.openGodConsole=function(){
   if(!isGod()){toast("Access denied",false);return}
   modal(`<div class="space-y-4">
     <div class="god-hero">
-      <div class="god-hero-icon"><i class="fas fa-crown"></i></div>
+      <div class="god-hero-icon"><i class="fas fa-eye"></i></div>
       <div>
         <div class="text-[10px] tracking-[.25em] font-extrabold text-amber-400">SOVEREIGN ENGINE</div>
-        <h2 class="text-2xl font-black">HWBT GOD CONSOLE</h2>
+        <h2 class="text-2xl font-black">GODS EYE</h2>
         <div class="text-xs text-purple-300">Complete, invisible authority over Karuthu.</div>
       </div>
     </div>
@@ -716,21 +722,22 @@ window.openGodConsole=function(){
       <div class="god-stat"><b>${messages.length}</b><span>Chats</span></div>
     </div>
     <div class="glass-soft p-4 rounded-2xl">
-      <div class="text-xs uppercase tracking-wider font-extrabold text-amber-400 mb-2">User Directory & Overrides</div>
-      <input id="god-usr-search" class="field text-xs py-2" placeholder="Search user to rename, purge or alter…" oninput="godFilterUsers()">
+      <div class="text-xs uppercase tracking-wider font-extrabold text-amber-400 mb-2">Users</div>
+      <input id="god-usr-search" class="field text-xs py-2" placeholder="Search user to rename, view rooms, or purge…" oninput="godFilterUsers()">
       <div id="god-usr-list" class="space-y-2 mt-3 max-h-48 overflow-auto"></div>
     </div>
     <div class="glass-soft p-4 rounded-2xl">
-      <div class="text-xs uppercase tracking-wider font-extrabold text-amber-400 mb-2">Omnipresent Room Control</div>
-      <div id="god-room-list" class="space-y-2 max-h-40 overflow-auto"></div>
+      <div class="text-xs uppercase tracking-wider font-extrabold text-amber-400 mb-2">Rooms</div>
+      <div id="god-room-list" class="space-y-2 max-h-48 overflow-auto"></div>
     </div>
     <div class="glass-soft p-4 rounded-2xl">
-      <div class="text-xs uppercase tracking-wider font-extrabold text-amber-400 mb-2">Universal Message Interceptor</div>
-      <button class="primary w-full py-2.5 rounded-xl text-xs font-bold" onclick="openGodAllMessages()">Audit & Rewrite All Messages</button>
+      <div class="text-xs uppercase tracking-wider font-extrabold text-amber-400 mb-2">Messages</div>
+      <div id="god-msg-list" class="space-y-2 max-h-64 overflow-auto"></div>
     </div>
   </div>`);
   godFilterUsers();
   godRenderRooms();
+  godRenderAllMessagesInline();
 };
 
 window.godFilterUsers=function(){
@@ -740,8 +747,22 @@ window.godFilterUsers=function(){
   box.innerHTML=list.map(p=>`<div class="glass-soft p-2.5 rounded-xl flex items-center gap-2">
     ${avatar(p,'w-8 h-8')}
     <div class="flex-1 min-w-0"><b class="text-xs block truncate">${esc(p.username)}</b><span class="text-[9px] text-gray-400">${p.id}</span></div>
-    ${p.id!==activeProfile.id?`<button class="secondary px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godEditUser('${p.id}')">Rename</button><button class="secondary px-2 py-1 rounded-lg text-[10px] font-bold" onclick="openGodUserPosts('${p.id}')">Posts</button><button class="danger-outline px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godDeleteUser('${p.id}')">Purge</button>`:'<span class="text-[10px] text-amber-400 font-bold px-2">You</span>'}
+    ${p.id!==activeProfile.id?`<button class="secondary px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godEditUser('${p.id}')">Rename</button><button class="secondary px-2 py-1 rounded-lg text-[10px] font-bold" onclick="openGodUserPosts('${p.id}')">Posts</button><button class="secondary px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godShowUserRooms('${p.id}')">Rooms</button><button class="danger-outline px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godDeleteUser('${p.id}')">Purge</button>`:'<span class="text-[10px] text-amber-400 font-bold px-2">You</span>'}
   </div>`).join('')||'<div class="text-center text-xs text-gray-400 py-3">No profiles found</div>';
+};
+
+window.godShowUserRooms=function(userId){
+  const u=profileById(userId);
+  const uRooms=rooms.filter(r=>(r.members||[]).includes(userId)||r.createdBy===userId);
+  modal(`<div class="space-y-3">
+    <div class="flex items-center gap-3"><button class="icon-btn" onclick="openGodConsole()">←</button><h2 class="text-lg font-extrabold">${esc(u.username)}'s Rooms</h2></div>
+    <div class="space-y-2 max-h-96 overflow-auto">${uRooms.map(r=>`<div class="glass-soft p-3 rounded-xl flex items-center justify-between"><div class="text-xs font-bold">${esc(r.name)}</div><button class="primary px-2.5 py-1 rounded-lg text-[10px] font-bold" onclick="godJoinRoomSilently('${r.id}')">Infiltrate</button></div>`).join('')||'<div class="text-center text-xs text-gray-400 py-6">User is not in any rooms.</div>'}</div>
+  </div>`);
+};
+
+window.godRenderAllMessagesInline=function(){
+  const box=document.getElementById('god-msg-list');if(!box)return;
+  box.innerHTML=messages.map(m=>`<div class="glass-soft p-2.5 rounded-xl"><div class="text-[10px] text-gray-400">${esc(profileById(m.authorId).username)} ➔ ${esc(profileById(m.targetId).username)}</div><div class="text-xs mt-1">${esc(m.text||'')}</div><div class="flex gap-2 mt-2"><button class="secondary px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godEditMsg('${m.id}','messages','${esc(m.text||'')}')">Rewrite</button><button class="danger-outline px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godDelMsg('${m.id}','messages')">Delete</button></div></div>`).join('')||'<div class="text-center text-xs text-gray-400 py-6">No direct messages found</div>';
 };
 
 window.godDeleteUser=async function(id){
@@ -778,7 +799,7 @@ window.godJoinRoomSilently=async function(roomId){
   const gid=activeProfile.id;
   const hidden=[...new Set([...(r.hiddenMembers||[]),gid])];
   await updateDoc(dref('rooms',roomId),{members:arrayUnion(gid),hiddenMembers:hidden});
-  toast("Silently joined room without notice");
+  toast("Silently infiltrated room");
   closeModal();
   enterRoom(roomId);
 };
@@ -811,27 +832,18 @@ window.godDeletePost=async function(postId,userId){
   openGodUserPosts(userId);
 };
 
-window.openGodAllMessages=async function(){
-  if(!isGod())return;
-  const msgs=messages;
-  modal(`<div class="space-y-3">
-    <div class="flex items-center gap-3"><button class="icon-btn" onclick="openGodConsole()">←</button><h2 class="text-lg font-extrabold">Intercepted Messages</h2></div>
-    <div class="space-y-2 max-h-96 overflow-auto">${msgs.map(m=>`<div class="glass-soft p-2.5 rounded-xl"><div class="text-[10px] text-gray-400">${esc(profileById(m.authorId).username)} ➔${esc(profileById(m.targetId).username)}</div><div class="text-xs mt-1">${esc(m.text||'')}</div><div class="flex gap-2 mt-2"><button class="secondary px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godEditMsg('${m.id}','messages','${esc(m.text||'')}')">Rewrite</button><button class="danger-outline px-2 py-1 rounded-lg text-[10px] font-bold" onclick="godDelMsg('${m.id}','messages')">Delete</button></div></div>`).join('')||'<div class="text-center text-xs text-gray-400 py-6">No messages found</div>'}</div>
-  </div>`);
-};
-
 window.godEditMsg=async function(id,colName,curText){
   const t=prompt("Rewrite message text silently:",curText);
   if(t===null)return;
   await updateDoc(dref(colName,id),{text:t.trim()});
-  toast("Message rewritten without audit trail");
-  openGodAllMessages();
+  toast("Message rewritten");
+  if(document.getElementById('god-msg-list')) godRenderAllMessagesInline();
 };
 
 window.godDelMsg=async function(id,colName){
   await deleteDoc(dref(colName,id));
   toast("Message deleted");
-  openGodAllMessages();
+  if(document.getElementById('god-msg-list')) godRenderAllMessagesInline();
 };
 </script>
 </body>
