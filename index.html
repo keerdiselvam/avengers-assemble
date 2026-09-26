@@ -155,7 +155,13 @@ body.god-mode .fab{background:linear-gradient(145deg,var(--god-gold),#8a2be2)!im
 </section>
 
 <section id="chat" class="view hidden p-4 pb-28">
-  <div class="glass card p-4 mb-3 max-w-3xl mx-auto flex items-center justify-between"><div><div class="text-xs font-bold text-teal-700">MESSAGES</div><h2 class="text-xl font-extrabold">Direct Chats</h2></div><button class="primary px-3 py-2 rounded-xl text-xs font-bold" onclick="openNewChat()">New chat</button></div>
+  <div class="glass card p-4 mb-3 max-w-3xl mx-auto flex items-center justify-between">
+    <div><div class="text-xs font-bold text-teal-700">MESSAGES</div><h2 class="text-xl font-extrabold">Direct Chats</h2></div>
+    <div class="flex gap-2">
+      <button class="secondary px-3 py-2 rounded-xl text-xs font-bold" onclick="openMessageSearch()" title="Search Messages"><i class="fas fa-search"></i></button>
+      <button class="primary px-3 py-2 rounded-xl text-xs font-bold" onclick="openNewChat()">New chat</button>
+    </div>
+  </div>
   <div id="chat-list" class="space-y-3 max-w-3xl mx-auto"></div>
 </section>
 
@@ -480,10 +486,19 @@ function renderFeed(){
   document.getElementById("feed-container").innerHTML=list.length?list.map(renderPost).join(""):'<div class="glass card p-12 text-center"><b>No posts yet</b><p class="text-xs text-gray-500 mt-1">Start a conversation.</p></div>';
 }
 
+/* === STANDARD USER MESSAGE EDITING & GOD DELETE IN ROOMS === */
+window.editUserRoomMsg = async function(id, currentText) {
+  const newText = prompt("Edit your message:", currentText);
+  if (newText !== null && newText.trim() !== "") {
+    await updateDoc(dref('roomMessages', id), { text: newText.trim() });
+    toast("Message updated");
+  }
+};
+
 function renderRoomFeed(roomId){
   const room=rooms.find(r=>r.id===roomId);
   const box=document.getElementById("feed-container");if(!room||!box)return;
-  box.innerHTML=`<div class="glass card p-4"><div class="flex items-center gap-3 border-b pb-3"><div class="avatar w-10 h-10 rounded-xl"><i class="fas fa-${room.private?'lock':'hashtag'}"></i></div><div class="flex-1"><h2 class="text-lg font-extrabold">${esc(room.name)}</h2><div class="text-xs text-gray-500">${room.private?'Private':'Public'} Room Chat</div></div><button class="secondary px-3 py-1.5 rounded-xl text-xs font-bold" onclick="openRoomDetails('${roomId}')">Info</button></div><div id="room-feed-chat" class="room-feed-chat max-h-[55dvh] overflow-auto py-4 space-y-2"></div><div class="chat-compose"><input id="room-feed-input" class="field py-2.5" placeholder="Message room…" autocomplete="off"><button id="room-feed-send" class="primary w-11 h-11 rounded-2xl" onclick="sendRoomMessage('${roomId}')"><i class="fas fa-paper-plane text-xs"></i></button></div></div>`;
+  box.innerHTML=`<div class="glass card p-4"><div class="flex items-center gap-3 border-b pb-3"><div class="avatar w-10 h-10 rounded-xl"><i class="fas fa-${room.private?'lock':'hashtag'}"></i></div><div class="flex-1"><h2 class="text-lg font-extrabold">${esc(room.name)}</h2><div class="text-xs text-gray-500">${room.private?'Private':'Public'} Room Chat</div></div><button class="secondary px-3 py-1.5 rounded-xl text-xs font-bold" onclick="openRoomDetails('${roomId}')">Info</button></div><div id="room-feed-chat" class="room-feed-chat max-h-[55dvh] overflow-auto py-4 space-y-2"></div><div class="chat-compose"><input id="room-feed-input" class="field py-2.5" placeholder="Message room…" autocomplete="off" onkeydown="if(event.key==='Enter') sendRoomMessage('${roomId}')"><button id="room-feed-send" class="primary w-11 h-11 rounded-2xl" onclick="sendRoomMessage('${roomId}')"><i class="fas fa-paper-plane text-xs"></i></button></div></div>`;
   
   onSnapshot(col('roomMessages'),snap=>{
     const chat=document.getElementById('room-feed-chat');if(!chat)return;
@@ -492,15 +507,22 @@ function renderRoomFeed(roomId){
     chat.innerHTML=list.map(m=>{
       const p=profileById(m.authorId);
       const isMine=m.authorId===activeProfile.id;
+      
       return `<div class="flex ${isMine?'justify-end':'justify-start'}">
         <div class="${isMine?'primary':'glass-soft'} max-w-[85%] rounded-2xl px-3 py-2 text-xs relative group">
           <b>${esc(p.username)}</b>
           <div class="mt-0.5 text-sm">${esc(m.text||'')}</div>
-          <div class="text-[8px] opacity-60 text-right mt-1">${new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+          
+          <div class="flex items-center justify-between mt-1 border-t ${isMine?'border-white/20':'border-gray-400/20'} pt-1">
+            <span class="text-[8px] opacity-60">${new Date(m.createdAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</span>
+            ${isMine ? `<button class="text-[9px] font-bold opacity-70 hover:opacity-100 transition" onclick="editUserRoomMsg('${m.id}', '${esc(m.text||'')}')">Edit</button>` : ''}
+          </div>
+          
           ${isGod() ? `<button class="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity" onclick="godDelMsg('${m.id}','roomMessages')" title="God Delete">×</button>` : ''}
         </div>
       </div>`;
     }).join('')||'<div class="text-center text-xs text-gray-400 py-10">Room is quiet. Say hello!</div>';
+    
     chat.scrollTop=chat.scrollHeight;
   });
 }
@@ -510,6 +532,71 @@ window.sendRoomMessage=async roomId=>{
   if(!text)return;
   await addDoc(col('roomMessages'),{roomId,authorId:activeProfile.id,text,createdAt:Date.now()});
   input.value='';
+};
+
+/* === UNIVERSAL MESSAGE SEARCH === */
+window.getDocsSafe = async function(name) {
+  return new Promise(resolve => {
+    const u = onSnapshot(col(name), s => {
+      u(); resolve(s.docs.map(x => ({id: x.id, ...x.data()})));
+    }, {includeMetadataChanges: false});
+  });
+};
+
+window.openMessageSearch = function() {
+  modal(`<div class="space-y-3">
+    <div class="flex items-center gap-3 border-b border-white/20 pb-3">
+      <button class="icon-btn" onclick="closeModal()">←</button>
+      <h2 class="text-xl font-extrabold">Search Messages</h2>
+    </div>
+    <div class="flex gap-2">
+      <input id="msg-search-input" class="field py-2.5" placeholder="Search your DMs and Rooms..." onkeydown="if(event.key==='Enter') runMessageSearch()">
+      <button class="primary px-4 rounded-xl font-bold text-xs" onclick="runMessageSearch()"><i class="fas fa-search"></i></button>
+    </div>
+    <div id="msg-search-results" class="space-y-2 mt-3 max-h-[60dvh] overflow-auto"></div>
+  </div>`);
+};
+
+window.runMessageSearch = async function() {
+  const q = (document.getElementById('msg-search-input')?.value || '').toLowerCase().trim();
+  const box = document.getElementById('msg-search-results');
+  if (!q) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div class="text-center text-xs text-gray-400 py-6"><i class="fas fa-spinner fa-spin text-2xl"></i></div>';
+  
+  try {
+    const myDMs = (window.messages || []).filter(m => String(m.text||'').toLowerCase().includes(q));
+    const allRm = await window.getDocsSafe('roomMessages');
+    const myRooms = (window.rooms || []).filter(r => (r.members||[]).includes(activeProfile.id) || r.createdBy === activeProfile.id).map(r=>r.id);
+    const myRoomMsgs = allRm.filter(m => myRooms.includes(m.roomId) && String(m.text||'').toLowerCase().includes(q));
+    
+    const combined = [
+      ...myDMs.map(m => ({...m, _type: 'DM'})), 
+      ...myRoomMsgs.map(m => ({...m, _type: 'Room'}))
+    ].sort((a,b) => b.createdAt - a.createdAt).slice(0, 50);
+
+    if(!combined.length) {
+      box.innerHTML = '<div class="text-center text-xs text-gray-400 py-6">No matching messages found.</div>';
+      return;
+    }
+
+    box.innerHTML = combined.map(m => {
+      const author = profileById(m.authorId);
+      const isRoom = m._type === 'Room';
+      const roomName = isRoom ? (rooms.find(r=>r.id===m.roomId)?.name || 'Unknown Room') : '';
+      const targetName = !isRoom ? (m.authorId === activeProfile.id ? profileById(m.targetId).username : author.username) : '';
+      
+      return `<div class="glass-soft p-3 rounded-xl cursor-pointer hover:bg-white/10 transition" onclick="closeModal(); ${isRoom ? `enterRoom('${m.roomId}')` : `openDM('${m.authorId === activeProfile.id ? m.targetId : m.authorId}')`}">
+        <div class="text-[9px] text-gray-400 flex justify-between uppercase tracking-wider font-bold mb-1">
+          <span><i class="fas ${isRoom ? 'fa-hashtag' : 'fa-user'} mr-1"></i> ${isRoom ? esc(roomName) : 'DM: ' + esc(targetName)}</span>
+          <span>${new Date(m.createdAt).toLocaleDateString()}</span>
+        </div>
+        <div class="text-xs font-bold text-teal-600">${esc(author.username)}</div>
+        <div class="text-sm mt-0.5 truncate">${esc(m.text||'')}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    box.innerHTML = '<div class="text-center text-xs text-rose-400 py-6">Error searching messages.</div>';
+  }
 };
 
 function renderPost(p){
