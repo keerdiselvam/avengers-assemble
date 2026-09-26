@@ -624,6 +624,7 @@ function renderPost(p){
   </article>`;
 }
 
+/* === MISSING SAVE FUNCTIONS RESTORED === */
 window.savePost=async id=>{
   if(!activeProfile)return;
   const saved=[...(activeProfile.savedPosts||[])];
@@ -643,6 +644,7 @@ window.toggleSavedMessage=async id=>{
   activeProfile.savedMessages=ids;
   toast(i>=0?"Message unsaved":"Message saved");
   if(currentChatId)renderDM(currentChatId);
+  if(currentRoomId!=="global")renderRoomFeed(currentRoomId);
 };
 
 window.toggleComments=id=>document.getElementById("comments-"+id).classList.toggle("hidden");
@@ -854,6 +856,7 @@ let godAllMessagesCache = [];
 window.openGodConsole = async function(){
   if(!isGod()){toast("Access denied",false);return}
   
+  // Cache all messages for the message search tab
   godAllMessagesCache = [...messages.map(m=>({...m, _type:'DM', _col:'messages'}))];
   try {
      const rm = await getDocsSafe('roomMessages');
@@ -936,6 +939,7 @@ window.godFilterMessages=function(){
   const q=(document.getElementById('god-msg-search')?.value||'').toLowerCase();
   const box=document.getElementById('god-msg-list');if(!box)return;
   
+  // Show first 60 messages normally, filter if searching
   const list=godAllMessagesCache.filter(m=>!q||String(m.text||'').toLowerCase().includes(q)||String(profileById(m.authorId).username).toLowerCase().includes(q)).slice(0, 60);
 
   box.innerHTML=list.map(m=>{
@@ -1015,6 +1019,7 @@ window.godEditMsg=async function(id,colName,curText){
   await updateDoc(dref(colName,id),{text:t.trim()});
   toast("Message rewritten");
   
+  // Update local cache and UI
   const cm = godAllMessagesCache.find(x=>x.id===id);
   if(cm) cm.text = t.trim();
   if(document.getElementById('god-msg-list')) godFilterMessages();
@@ -1024,6 +1029,7 @@ window.godDelMsg=async function(id,colName){
   await deleteDoc(dref(colName,id));
   toast("Message deleted");
   
+  // Remove from cache and update UI
   godAllMessagesCache = godAllMessagesCache.filter(x=>x.id!==id);
   if(document.getElementById('god-msg-list')) godFilterMessages();
 };
